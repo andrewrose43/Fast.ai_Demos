@@ -56,4 +56,4 @@ def latents_to_image(latents, vae):
     image = (image / 2 + 0.5).clamp(0, 1)  # Make everything between 0 and 1
     image = image[0].detach().cpu().permute(1, 2, 0).numpy()  # Put it back on CPU and ensure order of dimensions is what Python imaging expects
     image = (image * 255).round().astype("uint8")
-    return image
+    return Image.fromarray(image)
