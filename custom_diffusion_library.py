@@ -3,6 +3,7 @@
 import torch
 from transformers import CLIPTextModel, CLIPTokenizer
 from diffusers import AutoencoderKL, UNet2DConditionModel, LMSDiscreteScheduler
+from PIL import Image
 
 
 ## These functions adapted from my notebook Ch10_NegativePrompts.ipynb
@@ -38,7 +39,7 @@ def encode_tokens(text_encoder, tokens):
     return text_encoder(tokens.input_ids.to("cuda"))[0].half()
 
 
-def generate_noise_latents(unet, scheduler, batch_size=1, seed, height, width):
+def generate_noise_latents(unet, scheduler, seed, height, width, batch_size=1):
     '''
     Returns a set of noise latents of the right specifications, both for the image size and the scheduler.
     '''
@@ -51,7 +52,7 @@ def latents_to_image(latents, vae):
     '''
     Convert latents to a full-resolution image.
     '''
-    with torch.no_grad(): vae.decode(1 / 0.18215 * latents).sample
+    with torch.no_grad(): image = vae.decode(1 / 0.18215 * latents).sample
     
     image = (image / 2 + 0.5).clamp(0, 1)  # Make everything between 0 and 1
     image = image[0].detach().cpu().permute(1, 2, 0).numpy()  # Put it back on CPU and ensure order of dimensions is what Python imaging expects
